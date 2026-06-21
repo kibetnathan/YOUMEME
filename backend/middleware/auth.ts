@@ -24,3 +24,18 @@ export async function requireAuth(
   req.userId = data.user.id;
   next();
 }
+
+export async function optionalAuth(
+  req: AuthedRequest,
+  res: Response,
+  next: NextFunction,
+) {
+  const authHeader = req.headers.authorization;
+
+  if (authHeader?.startsWith("Bearer")) {
+    const token = authHeader.split(" ")[1];
+    const { data } = await supabase.auth.getUser(token);
+    if (data.user) req.userId = data.user.id;
+  }
+  next();
+}
