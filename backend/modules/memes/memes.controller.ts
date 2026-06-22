@@ -1,21 +1,16 @@
 import { Request, Response, NextFunction } from "express";
 import * as memesService from "./memes.service";
 
-// Define the shape of your route params
-interface MemeParams {
-  id: string;
-}
-
 export async function getMemeHandler(
-  // Pass MemeParams as the first generic argument
-  req: Request<MemeParams>,
+  req: Request,
   res: Response,
   next: NextFunction,
 ): Promise<void> {
   // Now TypeScript automatically knows req.params.id is a string!
   try {
-    const meme = await memesService.getMemeById(req.params.id);
-    await memesService.incrementView(req.params.id);
+    const memeId = req.params.id as string;
+    const meme = await memesService.getMemeById(memeId);
+    await memesService.incrementView(memeId);
     res.json(meme);
   } catch (err) {
     next(err);
