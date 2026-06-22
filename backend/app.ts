@@ -1,5 +1,6 @@
 // Import the express in typescript file
 import express from "express";
+import cors from "cors";
 
 // Initialize the express engine
 const app: express.Application = express();
