@@ -1,5 +1,6 @@
 import { supabase } from "../../config/supabase";
 import { Meme } from "../../types";
+import { v4 as uuid } from "uuid";
 
 interface FeedParams {
   cursor?: string; // ISO timestamp of the last seen meme's created_at
@@ -54,4 +55,27 @@ export async function createMeme(payload: Partial<Meme>) {
     .single();
   if (error) throw error;
   return data as Meme;
+}
+
+export async function uploadMemeFile(
+  fileBuffer: Buffer,
+  mimetype: string,
+  originalName: string,
+) {
+  const ext = originalName.split(".").pop();
+  const path = `memes/${uuid()}.${ext}`;
+
+  const { error } = await supabase.storage
+    .from("meme-media")
+    .upload(path, fileBuffer, { contentType: mimetype });
+
+  if (error) throw error;
+
+  const { data } = supabase.storage.from("meme-media").getPublicUrl(path);
+  return {
+    url: data.publicUrl,
+    mediaType: mimetype.startsWith("video")
+      ? ("video" as const)
+      : ("image" as const),
+  };
 }
