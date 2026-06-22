@@ -1,20 +1,19 @@
 // Import the express in typescript file
 import express from "express";
 import cors from "cors";
+import helmet from "helmet";
+import memesRoutes from "./modules/memes/memes.routes";
+import { errorHandler } from "./middleware/error";
 
 // Initialize the express engine
 const app: express.Application = express();
 
-// Take a port 3000 for running server.
-const port: number = 3000;
+app.use(helmet());
+app.use(cors());
+app.use(express.json());
 
-// Handling '/' Request
-app.get("/", (_req, _res) => {
-  _res.send("TypeScript With Express");
-});
+app.use("/memes", memesRoutes);
 
-// Server setup
-app.listen(port, () => {
-  console.log(`TypeScript with Express 
-         http://localhost:${port}/`);
-});
+app.use(errorHandler);
+
+export default app;
